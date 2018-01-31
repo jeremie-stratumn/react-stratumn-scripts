@@ -4,3 +4,5 @@
  * manage their own state for some reason (class extends React.Component)
  * See http://redux.js.org/docs/basics/UsageWithReact.html
  */
+
+export { default as Welcome } from './welcome';

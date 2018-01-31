@@ -4,13 +4,12 @@ import { Router, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { MuiThemeProvider } from 'material-ui/styles';
 
-import history from 'store/history';
-import globalStyles from 'style';
+import { globalStyle } from 'style';
 import 'style/style.css';
 import { App } from './';
 
-const Root = ({ store }) => (
-  <MuiThemeProvider theme={globalStyles}>
+const Root = ({ store, history }) => (
+  <MuiThemeProvider theme={globalStyle}>
     <Provider store={store}>
       <Router history={history}>
         <Route path="/" component={App} />
@@ -22,6 +21,7 @@ const Root = ({ store }) => (
 Root.propTypes = {
   /* eslint-disable react/forbid-prop-types */
   store: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
   /* eslint-enable react/forbid-prop-types */
 };
 
