@@ -89,17 +89,7 @@ module.exports = function(
     }
   );
 
-  let command;
-  let args;
-
-  if (useYarn) {
-    command = 'yarnpkg';
-    args = ['add'];
-  } else {
-    command = 'npm';
-    args = ['install', '--save', verbose && '--verbose'].filter(e => e);
-  }
-  args.push('react', 'react-dom');
+  let { command, args, argsDev } = addPkgCmd(useYarn, verbose, false);
 
   // Install additional template dependencies, if present
   const templateDependenciesPath = path.join(
@@ -107,12 +97,9 @@ module.exports = function(
     '.template.dependencies.json'
   );
   if (fs.existsSync(templateDependenciesPath)) {
-    const templateDependencies = require(templateDependenciesPath).dependencies;
-    args = args.concat(
-      Object.keys(templateDependencies).map(key => {
-        return `${key}@${templateDependencies[key]}`;
-      })
-    );
+    const templateDependencies = require(templateDependenciesPath);
+    installDeps(false, command, args, templateDependencies.dependencies);
+    installDeps(true, command, argsDev, templateDependencies.devDependencies);
     fs.unlinkSync(templateDependenciesPath);
   }
 
@@ -191,4 +178,43 @@ function isReactInstalled(appPackage) {
     typeof dependencies.react !== 'undefined' &&
     typeof dependencies['react-dom'] !== 'undefined'
   );
+}
+
+function addPkgCmd(useYarn, verbose) {
+  if (useYarn) {
+    return {
+      command: 'yarnpkg',
+      args: ['add'],
+      argsDev: ['add -D'],
+    };
+  } else {
+    return {
+      command: 'npm',
+      args: ['install', '--save', verbose && '--verbose'].filter(e => e),
+      argsDev: ['install', '--save-dev', verbose && '--verbose'].filter(e => e),
+    };
+  }
+}
+
+function installDeps(dev, command, args, deps) {
+  if (!Object.keys(deps).length) {
+    return;
+  }
+
+  const argsWithDeps = args.concat(
+    Object.keys(deps).map(key => {
+      return `${key}@${deps[key]}`;
+    })
+  );
+
+  console.log(
+    `Installing ${dev ? 'dev' : ''} dependencies using ${command}...`
+  );
+  console.log();
+
+  const proc = spawn.sync(command, argsWithDeps, { stdio: 'inherit' });
+  if (proc.status !== 0) {
+    console.error(`\`${command} ${argsWithDeps.join(' ')}\` failed`);
+    return;
+  }
 }
