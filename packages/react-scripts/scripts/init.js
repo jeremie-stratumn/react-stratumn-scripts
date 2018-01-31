@@ -185,7 +185,7 @@ function addPkgCmd(useYarn, verbose) {
     return {
       command: 'yarnpkg',
       args: ['add'],
-      argsDev: ['add -D'],
+      argsDev: ['add', '-D'],
     };
   } else {
     return {
