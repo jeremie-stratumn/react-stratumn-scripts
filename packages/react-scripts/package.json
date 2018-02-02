@@ -1,6 +1,6 @@
 {
   "name": "react-stratumn-scripts",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Stratumn script to bootstrap a react app",
   "engines": {
     "node": ">=6"
